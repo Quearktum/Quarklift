@@ -30,9 +30,6 @@
                   >Leaderboard</router-link
                 >
               </li>
-              <li class="nav-item">
-              <router-link class="nav-link" to="/exercises">Exercises</router-link>
-            </li>
             </ul>
           </div>
         </div>

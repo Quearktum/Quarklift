@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import DashboardView from '../views/DashboardView.vue'
 import BrowseView from '../views/BrowseView.vue'
 import LeaderboardView from '../views/LeaderboardView.vue'
-import ExercisesComponent from '../components/Exercises.vue';
 
 const routes = [
   {
@@ -19,11 +18,6 @@ const routes = [
     path: '/leaderboard',
     name: 'Leaderboard',
     component: LeaderboardView
-  },
-  {
-    path: '/exercises',
-    name: 'Exercises',
-    component: ExercisesComponent
   }
 ]
 
