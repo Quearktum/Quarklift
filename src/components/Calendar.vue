@@ -9,6 +9,12 @@
         </div>
       </div>
     </div>
+    <WorkoutModal 
+      :isVisible="isModalVisible" 
+      :modalTitle="modalTitle" 
+      @close="isModalVisible = false" 
+      @add-workout="addWorkout"
+    />
   </div>
 </template>
 
@@ -17,10 +23,11 @@ import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { mapGetters } from "vuex";
+import WorkoutModal from './WorkoutModal.vue';
 
 export default {
   name: "CalendarComponent",
-  components: { FullCalendar },
+  components: { FullCalendar, WorkoutModal },
   data() {
     return {
       calendarOptions: {
@@ -30,6 +37,9 @@ export default {
         events: this.EVENTS,
         dateClick: this.handleDateClick,
       },
+      isModalVisible: false,
+      modalTitle: 'Add Workout',
+      selectedDate: null,
     };
   },
   computed: {
@@ -45,20 +55,15 @@ export default {
   },
   methods: {
     handleDateClick(arg) {
-      console.log(arg);
+      this.selectedDate = arg.dateStr;
+      this.isModalVisible = true;
+    },
+    addWorkout(workoutTitle) {
       this.$store.commit("ADD_EVENT", {
-        title: "okeoke",
-        start: arg.dateStr,
-        allDay: arg.allDay,
+        title: workoutTitle,
+        start: this.selectedDate,
+        allDay: true,
       });
-      // let title = prompt("Enter workout title:");
-      // if (title) {
-      //   this.$store.commit("ADD_EVENT", {
-      //     title: title,
-      //     start: arg.dateStr,
-      //     allDay: true
-      //   });
-      // }
     },
   },
 };
@@ -67,6 +72,8 @@ export default {
 <style scoped>
 .container {
   margin: auto;
+  position: relative;
+  z-index: 0;
 }
 .card {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
