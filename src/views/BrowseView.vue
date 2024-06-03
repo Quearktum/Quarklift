@@ -35,9 +35,9 @@
     </div>
 
     <!-- Results Grid -->
-    <div v-if="filteredExercises.length" class="row">
+    <div v-if="paginatedExercises.length" class="row">
       <h3 class="mb-4">Results:</h3>
-      <div v-for="result in filteredExercises" :key="result.id" class="col-md-4 mb-4">
+      <div v-for="result in paginatedExercises" :key="result.id" class="col-md-4 mb-4">
         <div class="card h-100">
           <img 
             :src="result.images[0]?.image || placeholderImage" 
@@ -59,6 +59,38 @@
     <div v-else>
       <p>No results found.</p>
     </div>
+
+    <!-- Pagination Controls -->
+    <nav aria-label="Page navigation" v-if="totalPages > 1">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" :class="{ disabled: currentPage === 1 }">
+          <a class="page-link" href="#" @click.prevent="prevPage">Previous</a>
+        </li>
+        <li class="page-item" v-if="visiblePages[0] > 1">
+          <a class="page-link" href="#" @click.prevent="goToPage(1)">1</a>
+        </li>
+        <li class="page-item" v-if="visiblePages[0] > 2">
+          <span class="page-link">...</span>
+        </li>
+        <li
+          class="page-item"
+          v-for="page in visiblePages"
+          :key="page"
+          :class="{ active: currentPage === page }"
+        >
+          <a class="page-link" href="#" @click.prevent="goToPage(page)">{{ page }}</a>
+        </li>
+        <li class="page-item" v-if="visiblePages[visiblePages.length - 1] < totalPages - 1">
+          <span class="page-link">...</span>
+        </li>
+        <li class="page-item" v-if="visiblePages[visiblePages.length - 1] < totalPages">
+          <a class="page-link" href="#" @click.prevent="goToPage(totalPages)">{{ totalPages }}</a>
+        </li>
+        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+          <a class="page-link" href="#" @click.prevent="nextPage">Next</a>
+        </li>
+      </ul>
+    </nav>
   </div>
 </template>
 
@@ -95,7 +127,9 @@ export default {
         2: "SZ-Bar",
         5: "Swiss Ball",
         7: "none (bodyweight exercise)"
-      }
+      },
+      currentPage: 1,
+      pageSize: 9
     };
   },
   computed: {
@@ -106,6 +140,36 @@ export default {
         const matchesEquipment = this.selectedEquipment ? exercise.equipment.includes(parseInt(this.selectedEquipment)) : true;
         return matchesSearch && matchesCategory && matchesEquipment;
       });
+    },
+    paginatedExercises() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.filteredExercises.slice(start, end);
+    },
+    totalPages() {
+      return Math.ceil(this.filteredExercises.length / this.pageSize);
+    },
+    visiblePages() {
+      const maxPagesToShow = 5;
+      const pages = [];
+      const halfMaxPagesToShow = Math.floor(maxPagesToShow / 2);
+      let startPage = Math.max(this.currentPage - halfMaxPagesToShow, 1);
+      let endPage = Math.min(startPage + maxPagesToShow - 1, this.totalPages);
+
+      if (endPage - startPage + 1 < maxPagesToShow) {
+        startPage = Math.max(endPage - maxPagesToShow + 1, 1);
+      }
+
+      // Ensure startPage is greater than 1 to avoid duplication of page 1
+      if (startPage === 1 && endPage < this.totalPages) {
+        endPage = Math.min(startPage + maxPagesToShow - 1, this.totalPages);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+
+      return pages;
     }
   },
   created() {
@@ -131,12 +195,24 @@ export default {
       }
     },
     performSearch() {
-      // The search logic is handled by the computed property
+      this.currentPage = 1; // Reset to first page after search
+    },
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
+    goToPage(page) {
+      this.currentPage = page;
     }
   }
 };
 </script>
-
 
 <style scoped>
 .container {
