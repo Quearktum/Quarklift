@@ -1,4 +1,5 @@
 import { createStore } from 'vuex'
+import axios from 'axios'
 
 const store = createStore({
     state: {
@@ -12,7 +13,22 @@ const store = createStore({
             state.events.push(event)
         }
     },
-    actions: {}
-})
+    actions: {
+        async saveWorkout({ commit }, workout) {
+            try {
+                const token = localStorage.getItem('token');
+                await axios.post('http://localhost:3000/log', workout, {
+                    headers: {
+                        Authorization: token
+                    }
+                });
+                commit('ADD_EVENT', workout);
+            } catch (error) {
+                console.error('Error saving workout:', error);
+                throw error;
+            }
+        }
+    }
+});
 
 export default store;

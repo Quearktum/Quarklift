@@ -58,12 +58,24 @@ export default {
       this.selectedDate = arg.dateStr;
       this.isModalVisible = true;
     },
-    addWorkout(workoutTitle) {
-      this.$store.commit("ADD_EVENT", {
-        title: workoutTitle,
+    async addWorkout(workout) {
+      const newEvent = {
+        title: workout.exercise,
         start: this.selectedDate,
         allDay: true,
-      });
+        exercise: workout.exercise,
+        reps: workout.reps,
+        sets: workout.sets,
+        weight: workout.weight,
+        date: this.selectedDate,
+        likes: 0 // Assuming likes start at 0
+      };
+      console.log('New Event:', newEvent); // Add console log for debugging
+      try {
+        await this.$store.dispatch("saveWorkout", newEvent);
+      } catch (error) {
+        console.error('Failed to save workout:', error);
+      }
     },
   },
 };

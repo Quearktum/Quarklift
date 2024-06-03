@@ -74,15 +74,36 @@ const verifyToken = (req, res, next) => {
   });
 };
 
-
 app.post('/log', verifyToken, (req, res) => {
   const { date, exercise, weight, reps, sets, likes } = req.body;
+  if (!exercise) {
+    return res.status(400).json({ error: "Exercise cannot be null" });
+  }
   db.query(
     'INSERT INTO workouts (user_id, date, exercise, weight, reps, sets, likes) VALUES (?, ?, ?, ?, ?, ?, ?)',
     [req.userId, date, exercise, weight, reps, sets, likes],
     (err, result) => {
-      if (err) throw err;
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ error: "Database error" });
+      }
       res.sendStatus(201);
+    }
+  );
+});
+
+
+app.put('/log/:id', verifyToken, (req, res) => {
+  const { date, exercise, weight, reps, sets, likes } = req.body;
+  db.query(
+    'UPDATE workouts SET date = ?, exercise = ?, weight = ?, reps = ?, sets = ?, likes = ? WHERE id = ? AND user_id = ?',
+    [date, exercise, weight, reps, sets, likes, req.params.id, req.userId],
+    (err, result) => {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ error: "Database error" });
+      }
+      res.sendStatus(200);
     }
   );
 });
@@ -97,13 +118,6 @@ app.get('/leaderboard', verifyToken, (req, res) => {
 // Fetch workouts for the user
 app.get('/workouts', verifyToken, (req, res) => {
   db.query('SELECT * FROM workouts WHERE user_id = ?', [req.userId], (err, results) => {
-    if (err) throw err;
-    res.json(results);
-  });
-});
-
-app.get('/leaderboard', verifyToken, (req, res) => {
-  db.query('SELECT users.username, workouts.exercise, workouts.weight, workouts.reps, workouts.sets, workouts.likes FROM workouts JOIN users ON workouts.user_id = users.id ORDER BY workouts.likes DESC', (err, results) => {
     if (err) throw err;
     res.json(results);
   });
