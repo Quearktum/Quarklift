@@ -33,6 +33,17 @@ db.connect(err => {
   console.log('Database connected!');
 });
 
+const verifyToken = (req, res, next) => {
+  const token = req.headers['authorization'];
+  if (!token) return res.sendStatus(403);
+
+  jwt.verify(token, 'secretkey', (err, decoded) => {
+    if (err) return res.sendStatus(403);
+    req.userId = decoded.userId;
+    next();
+  });
+};
+
 // User registration
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
@@ -41,7 +52,13 @@ app.post('/register', async (req, res) => {
     'INSERT INTO users (username, password) VALUES (?, ?)',
     [username, hashedPassword],
     (err, result) => {
-      if (err) throw err;
+      if (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+          return res.status(409).json({ message: 'Username already exists' });
+        } else {
+          return res.status(500).json({ message: 'Database error' });
+        }
+      }
       res.sendStatus(201);
     }
   );
@@ -63,16 +80,16 @@ app.post('/login', (req, res) => {
   });
 });
 
-const verifyToken = (req, res, next) => {
-  const token = req.headers['authorization'];
-  if (!token) return res.sendStatus(403);
-
-  jwt.verify(token, 'secretkey', (err, decoded) => {
-    if (err) return res.sendStatus(403);
-    req.userId = decoded.userId;
-    next();
+// Fetch user details
+app.get('/user', verifyToken, (req, res) => {
+  db.query('SELECT username FROM users WHERE id = ?', [req.userId], (err, results) => {
+    if (err) throw err;
+    if (results.length === 0) {
+      return res.sendStatus(404);
+    }
+    res.json(results[0]);
   });
-};
+});
 
 app.post('/log', verifyToken, (req, res) => {
   const { date, exercise, weight, reps, sets, likes } = req.body;
@@ -130,13 +147,13 @@ app.get('/leaderboard', verifyToken, (req, res) => {
   });
 });
 
+// Fetch workouts for the user
 app.get('/workouts', verifyToken, (req, res) => {
   db.query('SELECT * FROM workouts WHERE user_id = ?', [req.userId], (err, results) => {
     if (err) throw err;
     res.json(results);
   });
 });
-
 
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
