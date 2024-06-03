@@ -12,8 +12,10 @@
     <WorkoutModal 
       :isVisible="isModalVisible" 
       :modalTitle="modalTitle" 
+      :workoutData="selectedWorkout" 
       @close="isModalVisible = false" 
-      @add-workout="addWorkout"
+      @save-workout="saveWorkout"
+      @delete-workout="deleteWorkout"
     />
   </div>
 </template>
@@ -36,10 +38,12 @@ export default {
         selectable: true,
         events: this.EVENTS,
         dateClick: this.handleDateClick,
+        eventClick: this.handleEventClick // Added eventClick handler
       },
       isModalVisible: false,
       modalTitle: 'Add Workout',
       selectedDate: null,
+      selectedWorkout: null
     };
   },
   computed: {
@@ -56,27 +60,71 @@ export default {
   methods: {
     handleDateClick(arg) {
       this.selectedDate = arg.dateStr;
+      this.modalTitle = 'Add Workout';
+      this.selectedWorkout = null;
       this.isModalVisible = true;
     },
-    async addWorkout(workout) {
-      const newEvent = {
-        title: workout.exercise,
-        start: this.selectedDate,
-        allDay: true,
-        exercise: workout.exercise,
-        reps: workout.reps,
-        sets: workout.sets,
-        weight: workout.weight,
-        date: this.selectedDate,
-        likes: 0 // Assuming likes start at 0
-      };
-      console.log('New Event:', newEvent); // Add console log for debugging
-      try {
-        await this.$store.dispatch("saveWorkout", newEvent);
-      } catch (error) {
-        console.error('Failed to save workout:', error);
+    handleEventClick(info) {
+      console.log('Clicked event ID:', info.event.id);
+      console.log('Events array:', this.EVENTS);
+      const workout = this.EVENTS.find(event => event.id == info.event.id); // Using '==' to match string and number
+      console.log('Workout: ', workout);
+      if (workout) {
+        this.selectedDate = workout.date;
+        this.modalTitle = 'Update Workout';
+        this.selectedWorkout = { ...workout };
+        this.isModalVisible = true;
       }
     },
+    async saveWorkout(workout) {
+      console.log('Saving workout:', workout);
+      if (this.selectedWorkout) {
+        // Update existing workout
+        const updatedEvent = {
+          ...this.selectedWorkout,
+          ...workout,
+          id: this.selectedWorkout.id, // Ensure ID is passed for update
+          start: this.selectedDate,
+          title: workout.exercise,
+          allDay: true
+        };
+        console.log('Updated workout data:', updatedEvent);
+        try {
+          await this.$store.dispatch("updateWorkout", updatedEvent);
+        } catch (error) {
+          console.error('Failed to update workout:', error);
+        }
+      } else {
+        // Add new workout
+        const newEvent = {
+          title: workout.exercise,
+          start: this.selectedDate,
+          allDay: true,
+          exercise: workout.exercise,
+          reps: workout.reps,
+          sets: workout.sets,
+          weight: workout.weight,
+          date: this.selectedDate,
+          likes: 0 // Assuming likes start at 0
+        };
+        console.log('New workout data:', newEvent);
+        try {
+          await this.$store.dispatch("saveWorkout", newEvent);
+        } catch (error) {
+          console.error('Failed to save workout:', error);
+        }
+      }
+    },
+    async deleteWorkout(eventId) {
+      console.log('Deleting workout ID:', eventId);
+      try {
+        await this.$store.dispatch("deleteWorkout", eventId);
+        this.isModalVisible = false;
+        this.selectedWorkout = null;
+      } catch (error) {
+        console.error('Failed to delete workout:', error);
+      }
+    }
   },
 };
 </script>

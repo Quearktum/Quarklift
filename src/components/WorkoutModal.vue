@@ -12,7 +12,8 @@
         <input v-model="workout.weight" type="number" placeholder="Enter weight" />
       </div>
       <div class="modal-footer">
-        <button @click="addWorkout">Add Workout</button>
+        <button @click="saveWorkout">{{ modalButtonText }}</button>
+        <button v-if="workoutData" @click="deleteWorkout" class="delete-button">Delete Workout</button>
       </div>
     </div>
   </div>
@@ -21,7 +22,7 @@
 <script>
 export default {
   name: "WorkoutModal",
-  props: ["isVisible", "modalTitle"],
+  props: ["isVisible", "modalTitle", "workoutData"],
   data() {
     return {
       workout: {
@@ -32,18 +33,39 @@ export default {
       },
     };
   },
+  watch: {
+    workoutData: {
+      handler(newWorkout) {
+        if (newWorkout) {
+          this.workout = { ...newWorkout };
+        } else {
+          this.workout = { exercise: "", reps: "", sets: "", weight: "" };
+        }
+      },
+      immediate: true
+    }
+  },
+  computed: {
+    modalButtonText() {
+      return this.workoutData ? 'Update Workout' : 'Add Workout';
+    }
+  },
   methods: {
     closeModal() {
       this.$emit("close");
     },
-    addWorkout() {
+    saveWorkout() {
       if (this.workout.exercise && this.workout.reps && this.workout.sets && this.workout.weight) {
-        this.$emit("add-workout", this.workout);
+        this.$emit("save-workout", this.workout);
         this.closeModal();
       } else {
         alert("Please fill in all fields.");
       }
     },
+    deleteWorkout() {
+      this.$emit("delete-workout", this.workout.id);
+      this.closeModal();
+    }
   },
 };
 </script>
@@ -88,5 +110,13 @@ export default {
   padding: 10px;
   border-radius: 4px;
   border: 1px solid #ccc;
+}
+
+.delete-button {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
 }
 </style>

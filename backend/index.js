@@ -76,25 +76,19 @@ const verifyToken = (req, res, next) => {
 
 app.post('/log', verifyToken, (req, res) => {
   const { date, exercise, weight, reps, sets, likes } = req.body;
-  if (!exercise) {
-    return res.status(400).json({ error: "Exercise cannot be null" });
-  }
   db.query(
     'INSERT INTO workouts (user_id, date, exercise, weight, reps, sets, likes) VALUES (?, ?, ?, ?, ?, ?, ?)',
     [req.userId, date, exercise, weight, reps, sets, likes],
     (err, result) => {
-      if (err) {
-        console.error('Database error:', err);
-        return res.status(500).json({ error: "Database error" });
-      }
-      res.sendStatus(201);
+      if (err) throw err;
+      res.status(201).json({ id: result.insertId }); // Return the inserted ID
     }
   );
 });
 
-
 app.put('/log/:id', verifyToken, (req, res) => {
   const { date, exercise, weight, reps, sets, likes } = req.body;
+  console.log('Received update data:', req.body);
   db.query(
     'UPDATE workouts SET date = ?, exercise = ?, weight = ?, reps = ?, sets = ?, likes = ? WHERE id = ? AND user_id = ?',
     [date, exercise, weight, reps, sets, likes, req.params.id, req.userId],
@@ -102,6 +96,27 @@ app.put('/log/:id', verifyToken, (req, res) => {
       if (err) {
         console.error('Database error:', err);
         return res.status(500).json({ error: "Database error" });
+      }
+      console.log('Update result:', result);
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: "Workout not found" });
+      }
+      res.sendStatus(200);
+    }
+  );
+});
+
+app.delete('/log/:id', verifyToken, (req, res) => {
+  db.query(
+    'DELETE FROM workouts WHERE id = ? AND user_id = ?',
+    [req.params.id, req.userId],
+    (err, result) => {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ error: "Database error" });
+      }
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: "Workout not found" });
       }
       res.sendStatus(200);
     }
@@ -115,13 +130,14 @@ app.get('/leaderboard', verifyToken, (req, res) => {
   });
 });
 
-// Fetch workouts for the user
 app.get('/workouts', verifyToken, (req, res) => {
   db.query('SELECT * FROM workouts WHERE user_id = ?', [req.userId], (err, results) => {
     if (err) throw err;
     res.json(results);
   });
 });
+
+
 
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
