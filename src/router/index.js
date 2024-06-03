@@ -7,6 +7,10 @@ import Login from "../components/Login.vue";
 
 const routes = [
   {
+    path: "/",
+    redirect: "/dashboard"
+  },
+  {
     path: "/dashboard",
     name: "Dashboard",
     component: DashboardView,

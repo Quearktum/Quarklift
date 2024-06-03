@@ -58,6 +58,13 @@ export default {
     }
   },
   methods: {
+    async fetchWorkouts() {
+      try {
+        await this.$store.dispatch('fetchWorkouts');
+      } catch (error) {
+        console.error('Error fetching workouts:', error);
+      }
+    },
     handleDateClick(arg) {
       this.selectedDate = arg.dateStr;
       this.modalTitle = 'Add Workout';
@@ -126,6 +133,9 @@ export default {
       }
     }
   },
+  mounted() {
+    this.fetchWorkouts(); // Fetch workouts when component is mounted
+  }
 };
 </script>
 

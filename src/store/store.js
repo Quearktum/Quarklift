@@ -9,6 +9,9 @@ const store = createStore({
         EVENTS: state => state.events
     },
     mutations: {
+        SET_EVENTS: (state, events) => {
+            state.events = events
+        },
         ADD_EVENT: (state, event) => {
             state.events.push(event)
         },
@@ -23,6 +26,32 @@ const store = createStore({
         }
     },
     actions: {
+        async fetchWorkouts({ commit }) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get('http://localhost:3000/workouts', {
+                    headers: {
+                        Authorization: token
+                    }
+                });
+                const events = response.data.map(workout => ({
+                    id: workout.id,
+                    title: workout.exercise,
+                    start: workout.date,
+                    allDay: true,
+                    exercise: workout.exercise,
+                    reps: workout.reps,
+                    sets: workout.sets,
+                    weight: workout.weight,
+                    date: workout.date,
+                    likes: workout.likes
+                }));
+                commit('SET_EVENTS', events);
+            } catch (error) {
+                console.error('Error fetching workouts:', error);
+                throw error;
+            }
+        },
         async saveWorkout({ commit }, workout) {
             try {
                 const token = localStorage.getItem('token');
