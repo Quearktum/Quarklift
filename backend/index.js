@@ -22,10 +22,10 @@ app.use((req, res, next) => {
 app.use(favicon(path.join(__dirname, "..", "public", "favicon.ico")));
 
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "quarklift",
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'quarklift',
 });
 
 db.connect((err) => {
