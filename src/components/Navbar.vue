@@ -55,7 +55,7 @@ export default {
     ...mapActions(['logout']),
     handleLogout() {
       this.logout();
-      this.$router.push('/login'); // Redirect to login page on logout
+      this.$router.push('/login'); 
     }
   },
 };
@@ -73,6 +73,15 @@ export default {
 .navbar-toggler:focus {
   box-shadow: none;
 }
+
+.navbar-dark .navbar-toggler {
+  background-color: #212529;
+}
+
+.navbar-collapse {
+  background: #212529;
+}
+
 @media screen and (max-width: 991px) {
   .navbar-collapse.collapse:not(.show) {
     display: block;

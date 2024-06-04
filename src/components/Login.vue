@@ -1,12 +1,20 @@
 <template>
-  <div>
-    <h2>Login</h2>
-    <form @submit.prevent="handleLogin">
-      <input type="text" v-model="username" placeholder="Username" required />
-      <input type="password" v-model="password" placeholder="Password" required />
-      <button type="submit">Login</button>
-    </form>
-    <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <h2 class="mb-4 text-center">Login</h2>
+        <form @submit.prevent="handleLogin">
+          <div class="mb-3">
+            <input type="text" class="form-control" v-model="username" placeholder="Username" required />
+          </div>
+          <div class="mb-3">
+            <input type="password" class="form-control" v-model="password" placeholder="Password" required />
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+        <p v-if="errorMessage" class="error mt-3">{{ errorMessage }}</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -40,5 +48,6 @@ export default {
 <style scoped>
 .error {
   color: red;
+  text-align: center;
 }
 </style>

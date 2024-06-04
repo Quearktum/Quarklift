@@ -1,12 +1,11 @@
 import axios from 'axios';
 
-// Create an axios instance with increased timeout
 const apiClient = axios.create({
   baseURL: 'https://wger.de/api/v2/',
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000 // Increase timeout to 10 seconds
+  timeout: 10000 
 });
 
 async function getAllExercises(offset = 0, exercises = []) {
@@ -47,7 +46,6 @@ export default {
     exercises.forEach(exercise => {
       exercise.images = images.filter(image => image.exercise_base === exercise.exercise_base);
     });
-    console.log('Exercises with images:', exercises); // Log exercises with images
     return exercises;
   }
 };

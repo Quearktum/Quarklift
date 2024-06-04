@@ -2,36 +2,32 @@
   <div class="container mt-5">
     <h1 class="mb-4">Browse</h1>
 
-    <!-- Search Bar and Filters -->
-    <div class="mb-4">
-      <label for="search" class="form-label">Search:</label>
-      <input
-        type="text"
-        id="search"
-        class="form-control"
-        v-model="searchTerm"
-        placeholder="Enter search term"
-      />
-    </div>
-
-    <div class="mb-4">
-      <label for="filter" class="form-label">Filter by Category:</label>
-      <select id="filter" class="form-select" v-model="selectedCategory">
-        <option value="">All</option>
-        <option v-for="(name, id) in categories" :key="id" :value="id">{{ name }}</option>
-      </select>
-    </div>
-
-    <div class="mb-4">
-      <label for="equipment-filter" class="form-label">Filter by Equipment:</label>
-      <select id="equipment-filter" class="form-select" v-model="selectedEquipment">
-        <option value="">All</option>
-        <option v-for="(name, id) in equipment" :key="id" :value="id">{{ name }}</option>
-      </select>
-    </div>
-
-    <div class="mb-4">
-      <button class="btn btn-primary" @click="performSearch">Search</button>
+    <!-- Search Bar and Filters  -->
+    <div class="row mb-4">
+      <div class="col-md-6 mb-2">
+        <label for="search" class="form-label">Search:</label>
+        <input
+          type="text"
+          id="search"
+          class="form-control"
+          v-model="searchTerm"
+          placeholder="Enter search term"
+        />
+      </div>
+      <div class="col-md-3 mb-2">
+        <label for="filter" class="form-label">Filter by Category:</label>
+        <select id="filter" class="form-select" v-model="selectedCategory">
+          <option value="">All</option>
+          <option v-for="(name, id) in categories" :key="id" :value="id">{{ name }}</option>
+        </select>
+      </div>
+      <div class="col-md-3 mb-2">
+        <label for="equipment-filter" class="form-label">Filter by Equipment:</label>
+        <select id="equipment-filter" class="form-select" v-model="selectedEquipment">
+          <option value="">All</option>
+          <option v-for="(name, id) in equipment" :key="id" :value="id">{{ name }}</option>
+        </select>
+      </div>
     </div>
 
     <!-- Results Grid -->
@@ -60,7 +56,7 @@
       <p>No results found.</p>
     </div>
 
-    <!-- Pagination Controls -->
+    <!-- Pagination -->
     <nav aria-label="Page navigation" v-if="totalPages > 1">
       <ul class="pagination justify-content-center">
         <li class="page-item" :class="{ disabled: currentPage === 1 }">
@@ -105,7 +101,7 @@ export default {
       selectedEquipment: '',
       exercises: [],
       error: null,
-      placeholderImage: 'https://via.placeholder.com/150', // URL for the placeholder image
+      placeholderImage: 'https://via.placeholder.com/150', 
       categories: {
         10: "Abs",
         8: "Arms",
@@ -160,7 +156,6 @@ export default {
         startPage = Math.max(endPage - maxPagesToShow + 1, 1);
       }
 
-      // Ensure startPage is greater than 1 to avoid duplication of page 1
       if (startPage === 1 && endPage < this.totalPages) {
         endPage = Math.min(startPage + maxPagesToShow - 1, this.totalPages);
       }
@@ -188,14 +183,10 @@ export default {
           images: exercise.images || [],
           expanded: false
         }));
-        console.log('Fetched exercises:', this.exercises); // Log fetched exercises
       } catch (err) {
         this.error = 'Failed to load exercises';
         console.error(err);
       }
-    },
-    performSearch() {
-      this.currentPage = 1; // Reset to first page after search
     },
     prevPage() {
       if (this.currentPage > 1) {
@@ -216,14 +207,14 @@ export default {
 
 <style scoped>
 .container {
-  max-width: 800px;
+  max-width: 1000px;
   margin: auto;
 }
 .error {
   color: red;
 }
 .card {
-  height: 100%; /* Ensure the card takes full height */
+  height: 100%;
   display: flex;
   flex-direction: column;
 }

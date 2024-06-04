@@ -39,9 +39,9 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!store.getters.isAuthenticated) {
-      next('/login');
+      next("/login");
     } else {
       next();
     }
@@ -49,4 +49,5 @@ router.beforeEach((to, from, next) => {
     next();
   }
 });
+
 export default router;

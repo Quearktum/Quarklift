@@ -1,7 +1,7 @@
 <template>
   <div class="container mt-5">
     <div class="row justify-content-center">
-      <div class="col-md-8">
+      <div class="col-md-10">
         <div class="card">
           <div class="card-body">
             <FullCalendar :options="calendarOptions"/>
@@ -38,7 +38,7 @@ export default {
         selectable: true,
         events: this.EVENTS,
         dateClick: this.handleDateClick,
-        eventClick: this.handleEventClick // Added eventClick handler
+        eventClick: this.handleEventClick 
       },
       isModalVisible: false,
       modalTitle: 'Add Workout',
@@ -74,7 +74,7 @@ export default {
     handleEventClick(info) {
       console.log('Clicked event ID:', info.event.id);
       console.log('Events array:', this.EVENTS);
-      const workout = this.EVENTS.find(event => event.id == info.event.id); // Using '==' to match string and number
+      const workout = this.EVENTS.find(event => event.id == info.event.id);
       console.log('Workout: ', workout);
       if (workout) {
         this.selectedDate = workout.date;
@@ -90,7 +90,7 @@ export default {
         const updatedEvent = {
           ...this.selectedWorkout,
           ...workout,
-          id: this.selectedWorkout.id, // Ensure ID is passed for update
+          id: this.selectedWorkout.id, 
           start: this.selectedDate,
           title: workout.exercise,
           allDay: true
@@ -112,7 +112,7 @@ export default {
           sets: workout.sets,
           weight: workout.weight,
           date: this.selectedDate,
-          likes: 0 // Assuming likes start at 0
+          likes: 0 
         };
         console.log('New workout data:', newEvent);
         try {
@@ -134,7 +134,7 @@ export default {
     }
   },
   mounted() {
-    this.fetchWorkouts(); // Fetch workouts when component is mounted
+    this.fetchWorkouts(); 
   }
 };
 </script>
